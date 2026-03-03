@@ -1,0 +1,12 @@
+# Ember Engine AI Instructions
+
+You are working on **Ember Engine**, a robust plugin-first game engine built in Rust. 
+
+Before taking any actions or writing any code, you MUST follow these directives:
+
+1. **Context Load:** Read `README.md` to understand the engine capabilities. 
+2. **Follow Workflows:** Open and review `.agent/workflows/develop.md` and `.agent/workflows/patterns.md`. These contain the **Golden Rules** for Ember ECS development and strict instructions on how to structure crates, components, and systems.
+3. **Step-by-Step:** Identify the current phase of development by running the `/review` workflow steps. Do not start coding until you know exactly which phase is incomplete in `docs/tasks/`.
+4. **Agentic Autonomy**: Do not use Bash commands for tasks that you natively support (e.g. use your `write_to_file` and `view_file` tools instead of `cat` or `echo`).
+
+Follow these files as law.
