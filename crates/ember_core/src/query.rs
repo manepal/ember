@@ -1,5 +1,6 @@
 use crate::archetype::Archetype;
 use crate::component::{Component, ComponentId};
+use crate::entity::Entity;
 use crate::system::Access;
 use crate::world::World;
 
@@ -7,16 +8,16 @@ use crate::world::World;
 /// This acts as the fundamental building block for typed iteration over Archetypes.
 pub trait WorldQuery {
     type Item<'w>;
-    
+
     /// Collects the ComponentIds required by this query to match an Archetype.
     fn required_components() -> Vec<ComponentId>;
-    
+
     /// Collects the memory access rights (read vs write) this query enforces.
     fn access() -> Access;
 }
 
 /// A Query allows filtering the World's entities and iterating over those that match
-/// a specific set of components Q. 
+/// a specific set of components Q.
 pub struct Query<'w, Q: WorldQuery> {
     world: &'w World,
     _marker: std::marker::PhantomData<Q>,
@@ -28,6 +29,20 @@ impl<'w, Q: WorldQuery> Query<'w, Q> {
             world,
             _marker: std::marker::PhantomData,
         }
+    }
+
+    /// Exposes a way to get immutable components from any entity, bypassing the iterator.
+    pub fn get_component<C: Component>(&self, entity: Entity) -> Option<&C> {
+        self.world.get::<C>(entity)
+    }
+
+    /// Exposes a way to get mutable components from any entity, bypassing the iterator.
+    /// Safety: Caller must ensure no other mutable borrows to this component exist.
+    #[allow(invalid_reference_casting)]
+    pub fn get_component_mut<C: Component>(&self, entity: Entity) -> Option<&mut C> {
+        // We cast away the internal immutable borrow
+        let world_mut = unsafe { &mut *(self.world as *const World as *mut World) };
+        world_mut.get_mut::<C>(entity)
     }
 
     /// Fetches an Iterator dynamically querying all Archetypes for matching items.
@@ -58,7 +73,7 @@ impl<T: Component> WorldQuery for &T {
     fn required_components() -> Vec<ComponentId> {
         vec![ComponentId::of::<T>()]
     }
-    
+
     fn access() -> Access {
         let mut acc = Access::default();
         acc.reads.push(std::any::TypeId::of::<T>());
@@ -73,11 +88,24 @@ impl<T: Component> WorldQuery for &mut T {
     fn required_components() -> Vec<ComponentId> {
         vec![ComponentId::of::<T>()]
     }
-    
+
     fn access() -> Access {
         let mut acc = Access::default();
         acc.writes.push(std::any::TypeId::of::<T>());
         acc
+    }
+}
+
+// Entity Query
+impl WorldQuery for Entity {
+    type Item<'w> = Entity;
+
+    fn required_components() -> Vec<ComponentId> {
+        vec![]
+    }
+
+    fn access() -> Access {
+        Access::default()
     }
 }
 
@@ -94,14 +122,14 @@ macro_rules! impl_world_query_tuple {
                 )*
                 reqs
             }
-            
+
             fn access() -> Access {
                 let mut acc = Access::default();
                 $( acc.merge(&$name::access()); )*
                 acc
             }
         }
-        
+
         impl<'w, $($name: Fetch<'w>),*> Fetch<'w> for ($($name,)*) {
             type Item = ($($name::Item,)*);
 
@@ -134,7 +162,10 @@ impl<'w, T: Component> Fetch<'w> for &T {
     type Item = &'w T;
 
     unsafe fn fetch(archetype: &'w Archetype, row: usize) -> Self::Item {
-        let col_idx = *archetype.component_indices.get(&ComponentId::of::<T>()).unwrap();
+        let col_idx = *archetype
+            .component_indices
+            .get(&ComponentId::of::<T>())
+            .unwrap();
         archetype.columns[col_idx].get_unchecked::<T>(row)
     }
 }
@@ -148,8 +179,20 @@ impl<'w, T: Component> Fetch<'w> for &mut T {
         // The query system will dynamically check Aliasing rules to prevent split `&mut` bugs!
         // Unsafe block here is an explicit bridge from ECS type erasure to typed output.
         let arch_ptr = archetype as *const Archetype as *mut Archetype;
-        let col_idx = *(&*arch_ptr).component_indices.get(&ComponentId::of::<T>()).unwrap();
+        let col_idx = *(&*arch_ptr)
+            .component_indices
+            .get(&ComponentId::of::<T>())
+            .unwrap();
         (&mut (*arch_ptr).columns)[col_idx].get_mut_unchecked::<T>(row)
+    }
+}
+
+// Implement Fetch for Entity
+impl<'w> Fetch<'w> for Entity {
+    type Item = Entity;
+
+    unsafe fn fetch(archetype: &'w Archetype, row: usize) -> Self::Item {
+        archetype.entities[row]
     }
 }
 
@@ -161,9 +204,9 @@ pub struct QueryIter<'w, Q: WorldQuery> {
     _marker: std::marker::PhantomData<Q>,
 }
 
-impl<'w, Q: WorldQuery> Iterator for QueryIter<'w, Q> 
-where 
-    Q: Fetch<'w, Item = <Q as WorldQuery>::Item<'w>> 
+impl<'w, Q: WorldQuery> Iterator for QueryIter<'w, Q>
+where
+    Q: Fetch<'w, Item = <Q as WorldQuery>::Item<'w>>,
 {
     type Item = <Q as WorldQuery>::Item<'w>;
 
@@ -175,7 +218,7 @@ where
 
             let arch = self.archetypes[self.current_arch_idx];
             let row = self.current_row;
-            
+
             if row < arch.entities.len() {
                 self.current_row += 1;
                 // Safety: `self.archetypes` is pre-filtered to only contain archetypes with `Q` components
@@ -206,8 +249,12 @@ mod tests {
     #[test]
     fn query_single_component() {
         let mut world = World::new();
-        
-        world.spawn().insert(Position(0.0, 0.0)).insert(Velocity(1.0, 0.0)).id();
+
+        world
+            .spawn()
+            .insert(Position(0.0, 0.0))
+            .insert(Velocity(1.0, 0.0))
+            .id();
         world.spawn().insert(Position(1.0, 1.0)).id();
         world.spawn().insert(Velocity(0.0, 1.0)).id();
 
@@ -222,20 +269,33 @@ mod tests {
     #[test]
     fn query_tuple_components() {
         let mut world = World::new();
-        
-        let e1 = world.spawn().insert(Position(0.0, 0.0)).insert(Velocity(1.0, 2.0)).insert(Name("Player")).id();
-        world.spawn().insert(Position(1.0, 1.0)).insert(Name("Tree")).id();
-        let e3 = world.spawn().insert(Position(10.0, 10.0)).insert(Velocity(-1.0, -1.0)).id();
+
+        let e1 = world
+            .spawn()
+            .insert(Position(0.0, 0.0))
+            .insert(Velocity(1.0, 2.0))
+            .insert(Name("Player"))
+            .id();
+        world
+            .spawn()
+            .insert(Position(1.0, 1.0))
+            .insert(Name("Tree"))
+            .id();
+        let e3 = world
+            .spawn()
+            .insert(Position(10.0, 10.0))
+            .insert(Velocity(-1.0, -1.0))
+            .id();
 
         let query = world.query::<(&mut Position, &Velocity)>();
-        
+
         let mut count = 0;
         for (pos, vel) in query.iter() {
             pos.0 += vel.0;
             pos.1 += vel.1;
             count += 1;
         }
-        
+
         assert_eq!(count, 2);
 
         // Verify mutations applied successfully to the correct entities
