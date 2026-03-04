@@ -1,15 +1,15 @@
-# Milestone 9 — Visual Editor + Hot-Reload
+# Milestone 11 — Visual Editor + Hot-Reload
 
 **Crates:** `ember_editor`, `ember_hot_reload`
-**Depends on:** Milestone 8
+**Depends on:** Milestone 10 (Scripting)
 **Effort:** ~2-3 weeks
-**Deliverable:** A native editor application where you build, test, and iterate on games in real-time.
+**Deliverable:** A native editor application where you build, test, and iterate on games in real-time. *(Note: The editor uses `egui`/`eframe` for its own UI — this is separate from the in-game `ember_gui` system built in Phase 5.)*
 
 ---
 
 ## Tasks
 
-### 9.1 Editor Shell
+### 11.1 Editor Shell
 
 - [ ] Create `ember_editor` binary crate
 - [ ] Set up `eframe` (egui native app framework) window
@@ -17,7 +17,7 @@
 - [ ] Implement menu bar: File (new/open/save scene), Edit (undo/redo), View (toggle panels)
 - [ ] Define `EditorState` resource: selected entity, active tool, editor mode (edit/play)
 
-### 9.2 Scene Viewport
+### 11.2 Scene Viewport
 
 - [ ] Embed wgpu render output inside an egui panel
 - [ ] Render the game world in real-time (shares render graph with the engine)
@@ -28,7 +28,7 @@
 - [ ] Draw selection outline around selected entity
 - [ ] Draw grid overlay (toggleable)
 
-### 9.3 Transform Gizmos
+### 11.3 Transform Gizmos
 
 - [ ] Implement translate gizmo (drag arrows for X/Y axes)
 - [ ] Implement rotate gizmo (arc handle)
@@ -37,7 +37,7 @@
 - [ ] Snap to grid (configurable step size)
 - [ ] Gizmo renders on top of scene (overlay pass)
 
-### 9.4 Hierarchy Panel
+### 11.4 Hierarchy Panel
 
 - [ ] Display all entities in a tree view respecting parent-child hierarchy
 - [ ] Click to select entity → updates inspector and viewport selection
@@ -45,7 +45,7 @@
 - [ ] Right-click context menu: rename, duplicate, delete, create child
 - [ ] Search/filter bar
 
-### 9.5 Inspector Panel
+### 11.5 Inspector Panel
 
 - [ ] Display all components on the selected entity
 - [ ] Auto-generate property editors based on component type via reflection:
@@ -60,7 +60,7 @@
 - [ ] "Add Component" button with searchable component list
 - [ ] "Remove Component" button (with confirmation)
 
-### 9.6 Asset Browser
+### 11.6 Asset Browser
 
 - [ ] Display project `assets/` folder as a file tree
 - [ ] Show thumbnails for images
@@ -69,7 +69,7 @@
 - [ ] Drag asset from browser → drop on viewport → spawn entity with appropriate components
 - [ ] Refresh on file system changes
 
-### 9.7 Console Panel
+### 11.7 Console Panel
 
 - [ ] Display structured logs from `tracing` subscriber
 - [ ] Color-code by level: info (white), warn (yellow), error (red)
@@ -78,7 +78,7 @@
 - [ ] Clear button
 - [ ] Optional: command input line for engine commands
 
-### 9.8 Play / Pause / Step
+### 11.8 Play / Pause / Step
 
 - [ ] **Play:** Snapshot world state → switch to play mode → run game loop normally
 - [ ] **Pause:** Freeze game loop, continue rendering (can inspect entities)
@@ -87,7 +87,7 @@
 - [ ] Visual indicator (toolbar color change) showing current mode
 - [ ] Disable scene editing during play mode (or allow with warning)
 
-### 9.9 Undo / Redo
+### 11.9 Undo / Redo
 
 - [ ] Implement command pattern: `EditorCommand` trait with `execute` and `undo`
 - [ ] Commands for: move entity, change property, add/remove component, create/delete entity, reparent
@@ -95,7 +95,7 @@
 - [ ] Keyboard shortcuts: Cmd+Z / Cmd+Shift+Z
 - [ ] Clear redo stack on new edit
 
-### 9.10 Scene Save / Load
+### 11.10 Scene Save / Load
 
 - [ ] Save current scene to RON file (via `ember_scene` serialization)
 - [ ] Load scene from RON file → populate world
@@ -103,7 +103,7 @@
 - [ ] Track "dirty" state — warn on unsaved changes before close/load
 - [ ] Recent files list in File menu
 
-### 9.11 Hot-Reload Infrastructure
+### 11.11 Hot-Reload Infrastructure
 
 - [ ] Implement `FileWatcher` using `notify` crate — watch `assets/` and `scripts/` recursively
 - [ ] On file change → classify (asset vs. script vs. Rust code)

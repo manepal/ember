@@ -1,0 +1,18 @@
+[package]
+name = "ember_gui"
+version = "0.1.0"
+edition = "2021"
+description = "Immediate-mode GUI system for in-game UI: panels, buttons, text, sliders, layout engine"
+
+[dependencies]
+ember_core = { path = "../ember_core" }
+ember_input = { path = "../ember_input" }
+ember_2d = { path = "../ember_2d" }
+ember_render = { path = "../ember_render" }
+glam = "0.29"
+fontdue = "0.9"
+wgpu = "24"
+
+[dev-dependencies]
+ember_assets = { path = "../ember_assets" }
+wgpu = "24"

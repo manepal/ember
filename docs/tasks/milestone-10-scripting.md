@@ -1,15 +1,15 @@
-# Milestone 8 — Scripting (Lua)
+# Milestone 10 — Scripting (Lua)
 
-**Crates:** `ember_script`, `ember_script_lua`
-**Depends on:** Milestone 7
+**Crate:** `ember_scripting`
+**Depends on:** Milestone 9 (NPC AI)
 **Effort:** ~3-4 days
-**Deliverable:** Lua scripts can control entity behavior; scripts hot-reload while the game runs.
+**Deliverable:** Lua scripting integration, scriptable components, and hot-reloadable game logic.
 
 ---
 
 ## Tasks
 
-### 8.1 ScriptHost Trait
+### 10.1 ScriptHost Trait
 
 - [ ] Define `ScriptHost` trait in `ember_script`:
   - `fn load_script(&mut self, path: &Path) → Result<ScriptId>`
@@ -19,7 +19,7 @@
 - [ ] Define `ScriptValue` enum: Nil, Bool, Int, Float, String, Vec2, Entity
 - [ ] Define `ScriptId` — opaque handle to a loaded script
 
-### 8.2 ScriptComponent
+### 10.2 ScriptComponent
 
 - [ ] Define `ScriptComponent`: backend type, script path, script id
 - [ ] Implement `ScriptSystem` — for each entity with `ScriptComponent`:
@@ -27,7 +27,7 @@
   - Optionally calls `on_start(entity)` on first frame
   - Calls `on_destroy(entity)` when entity is despawned
 
-### 8.3 Lua Backend
+### 10.3 Lua Backend
 
 - [ ] Implement `LuaScriptHost` via `mlua`:
   - Create Lua VM instance
@@ -43,14 +43,14 @@
   - `set_position(entity, x, y)`
 - [ ] Implement error handling — Lua errors → engine log, don't crash
 
-### 8.4 Script Hot-Reload
+### 10.4 Script Hot-Reload
 
 - [ ] Watch script files via `ember_hot_reload`
 - [ ] On change: unload old script, reload new version, call `on_start` again
 - [ ] Preserve per-entity script state where possible (via blackboard/component data)
 - [ ] Log reload events to console
 
-### 8.5 ScriptPlugin
+### 10.5 ScriptPlugin
 
 - [ ] Create `LuaScriptPlugin` that registers:
   - `LuaScriptHost` as a resource

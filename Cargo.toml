@@ -7,5 +7,6 @@ members = [
     "crates/ember_input",
     "crates/ember_assets",
     "crates/ember_scene",
+    "crates/ember_gui",
 ]
 resolver = "2"

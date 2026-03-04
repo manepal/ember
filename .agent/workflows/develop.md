@@ -229,6 +229,7 @@ Documentation is a living part of the project, not an afterthought. **Every impl
 |---|---|
 | New public API in a crate | Add rustdoc comments on all public items |
 | Task completed | Mark `[x]` in `docs/tasks/milestone-NN-*.md` |
+| New demo or feature added | Register in Ember Showcase (see step 7b) |
 | New pattern discovered | Add to `.agent/workflows/patterns.md` |
 | Architecture decision changed | Update `docs/architecture/overview.md` and/or `tech-decisions.md` |
 | New dependency added | Add to `docs/architecture/tech-decisions.md` with rationale |
@@ -241,6 +242,25 @@ Documentation is a living part of the project, not an afterthought. **Every impl
 - **Found a better approach?** Document it in the patterns workflow and update the milestone.
 - **Estimate was wrong?** Note the actual effort in `docs/milestones.md`.
 - **New example needed?** Add it to the examples list in the milestone doc.
+
+## 7b. Update the Ember Showcase
+
+**IMPORTANT:** Whenever you complete a new demo example or add a significant visual feature, you must also update the **Ember Showcase** (`examples/ember_showcase.rs` or `crates/ember_showcase`). This is the single-window launcher app that lets users browse and run all engine demos from one place.
+
+### When to update the Showcase:
+
+- A new `*_demo` example is created in any crate
+- An existing demo gets significantly reworked (new visuals, new interactions)
+- A new subsystem is added that should be demonstrated
+
+### How to update the Showcase:
+
+1. Add a new `DemoEntry` implementation for the demo
+2. Register it in the showcase's demo list with a name, description, and category
+3. Verify the demo can be loaded and unloaded cleanly from the showcase menu
+4. Test that ESC / Back returns to the menu without crashes
+
+> **Note:** If the Showcase app does not exist yet (it is planned for Milestone 5), skip this step but leave a `TODO` comment in the demo's source file: `// TODO: Register in Ember Showcase once available`
 
 ## 11. Continuously Improve the Agentic Workflow
 

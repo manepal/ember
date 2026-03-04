@@ -1,22 +1,22 @@
-# Milestone 7 — Game AI
+# Milestone 9 — NPC AI (In-Game Behavior)
 
-**Crate:** `ember_ai`
-**Depends on:** Milestone 6
+**Crate:** `ember_npc_ai`
+**Depends on:** Milestone 8 (Audio + Physics)
 **Effort:** ~1 week
-**Deliverable:** Enemies patrol, detect the player, chase via pathfinding, use steering behaviors.
+**Deliverable:** Behavior trees, finite state machines, A* pathfinding, and steering behaviors for NPC entities. *(Note: This is about deterministic game AI for NPCs — LLM-based AI integration is in Phase 12.)*
 
 ---
 
 ## Tasks
 
-### 7.1 Blackboard
+### 9.1 Blackboard
 
 - [ ] Implement `Blackboard` component — `HashMap<String, BlackboardValue>`
 - [ ] Define `BlackboardValue` enum: Bool, Int, Float, Vec2, Entity, String
 - [ ] Implement typed get/set convenience methods
 - [ ] Unit tests: insert, update, type mismatch handling
 
-### 7.2 Behavior Trees — Data Structures
+### 9.2 Behavior Trees — Data Structures
 
 - [ ] Define `BehaviorNode` enum:
   - **Composite:** `Sequence`, `Selector`, `Parallel`
@@ -25,7 +25,7 @@
 - [ ] Define `BehaviorStatus`: Running, Success, Failure
 - [ ] Define `BehaviorTree` component wrapping root node + tick state
 
-### 7.3 Behavior Trees — Execution
+### 9.3 Behavior Trees — Execution
 
 - [ ] Implement tree traversal (depth-first tick)
 - [ ] Implement `Sequence` — run children in order, fail on first failure
@@ -36,14 +36,14 @@
 - [ ] Support resuming `Running` nodes across frames
 - [ ] Unit tests: each node type, composed trees, running/suspend/resume
 
-### 7.4 Behavior Trees — Data-Driven
+### 9.4 Behavior Trees — Data-Driven
 
 - [ ] Define RON format for behavior tree definitions
 - [ ] Implement `BehaviorTreeLoader` for the asset server
 - [ ] Register action/condition functions by string name
 - [ ] Load tree from RON → resolve function references → instantiate
 
-### 7.5 Finite State Machines
+### 9.5 Finite State Machines
 
 - [ ] Define `State` trait: `on_enter`, `on_update`, `on_exit`
 - [ ] Define `Transition` struct: from_state, to_state, condition
@@ -51,7 +51,7 @@
 - [ ] Implement `StateMachineSystem` — evaluates transitions, manages state lifecycle
 - [ ] Unit tests: enter/update/exit hooks, transition chaining
 
-### 7.6 Pathfinding — NavGrid
+### 9.6 Pathfinding — NavGrid
 
 - [ ] Implement `NavGrid` resource: width, height, walkable bitmap, cost map
 - [ ] Implement A* on grid (`find_path(from, to) → Option<Vec<IVec2>>`)
@@ -60,14 +60,14 @@
 - [ ] Implement dynamic obstacle updates (re-mark cells)
 - [ ] Unit tests: known grids with known shortest paths, unreachable targets
 
-### 7.7 Pathfinding — Path Following
+### 9.7 Pathfinding — Path Following
 
 - [ ] Implement `PathFollower` component — stores current path, waypoint index
 - [ ] Implement `PathFollowSystem` — steers entity toward next waypoint
 - [ ] Request new paths via `PathRequest` event
 - [ ] Handle path invalidation (obstacle appeared on path)
 
-### 7.8 Steering Behaviors
+### 9.8 Steering Behaviors
 
 - [ ] Implement steering behavior functions → return `Vec2` force:
   - `seek(target)`, `flee(target)`, `arrive(target, decel_radius)`
@@ -81,5 +81,5 @@
 
 ## Exit Criteria
 
-- [ ] `cargo test -p ember_ai` — all tests pass
-- [ ] `examples/ai_demo` — enemies patrol waypoints, detect player, chase with A* pathfinding, flock with steering
+- [ ] `cargo test -p ember_npc_ai` — all tests pass
+- [ ] `examples/npc_ai_demo` — enemies patrol waypoints, detect player, chase with A* pathfinding, flock with steering
