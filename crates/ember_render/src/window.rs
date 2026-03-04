@@ -1,3 +1,4 @@
+use crate::context::GpuStartupCallbacks;
 use ember_core::app::App;
 use ember_core::plugin::Plugin;
 use std::sync::Arc;
@@ -114,6 +115,14 @@ impl ApplicationHandler for EmberAppHandler {
 
         // Initialize wgpu if RenderPlugin was added
         crate::context::initialize_wgpu(&mut self.app, window.clone());
+
+        // Run any registered post-GPU-init callbacks
+        if let Some(callbacks) = self.app.world.resource_mut::<GpuStartupCallbacks>() {
+            let fns = std::mem::take(&mut callbacks.callbacks);
+            for callback in fns {
+                callback(&mut self.app);
+            }
+        }
     }
 
     fn window_event(
