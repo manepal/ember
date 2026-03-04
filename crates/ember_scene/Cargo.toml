@@ -6,7 +6,11 @@ description = "Scene graph, RON serialization, prefabs"
 
 [dependencies]
 ember_core = { path = "../ember_core" }
+ember_2d = { path = "../ember_2d" }
+ember_assets = { path = "../ember_assets" }
 serde = { version = "1.0", features = ["derive"] }
 ron = "0.8"
+glam = "0.29"
 
 [dev-dependencies]
+ember_render = { path = "../ember_render" }
