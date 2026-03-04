@@ -1,0 +1,16 @@
+[package]
+name = "ember_2d"
+version = "0.1.0"
+edition = "2021"
+description = "2D sprite rendering, texture management, and batched draw calls"
+
+[dependencies]
+ember_core = { path = "../ember_core" }
+ember_render = { path = "../ember_render" }
+wgpu = "24"
+glam = "0.29"
+bytemuck = { version = "1", features = ["derive"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+log = "0.4"
+
+[dev-dependencies]
