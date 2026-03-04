@@ -7,10 +7,13 @@ description = "2D sprite rendering, texture management, and batched draw calls"
 [dependencies]
 ember_core = { path = "../ember_core" }
 ember_render = { path = "../ember_render" }
+ember_assets = { path = "../ember_assets" }
 wgpu = "24"
-glam = "0.29"
+glam = { version = "0.29", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
 bytemuck = { version = "1", features = ["derive"] }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+
 log = "0.4"
 
 [dev-dependencies]
