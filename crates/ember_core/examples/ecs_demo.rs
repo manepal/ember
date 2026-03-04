@@ -76,6 +76,6 @@ fn main() {
     // Run custom setup logic (since we don't have Startup systems yet)
     setup_system(&mut app.world);
 
-    // Run the main game loop
+    // Run the main game loop (consumes app)
     app.run();
 }

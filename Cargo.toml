@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "crates/ember_core",
+    "crates/ember_render",
 ]
 resolver = "2"

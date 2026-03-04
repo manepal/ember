@@ -1,0 +1,16 @@
+[package]
+name = "ember_render"
+version = "0.1.0"
+edition = "2021"
+description = "Render graph, wgpu backend, window management, and camera"
+
+[dependencies]
+ember_core = { path = "../ember_core" }
+wgpu = "24"
+winit = "0.30"
+glam = "0.29"
+bytemuck = { version = "1", features = ["derive"] }
+pollster = "0.4"
+log = "0.4"
+
+[dev-dependencies]

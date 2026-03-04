@@ -12,6 +12,9 @@ pub struct AppExit;
 pub struct App {
     pub world: World,
     pub schedule: Schedule,
+    /// Optional custom runner. Plugins (e.g. WindowPlugin) can replace the
+    /// default game loop by installing their own runner via `set_runner()`.
+    runner: Option<Box<dyn FnOnce(App)>>,
 }
 
 impl Default for App {
@@ -19,8 +22,8 @@ impl Default for App {
         let mut app = Self {
             world: World::new(),
             schedule: Schedule::new(),
+            runner: None,
         };
-        // Ensure AppExit events can be dispatched and handled from systems
         app.add_event::<AppExit>();
         app
     }
@@ -31,19 +34,16 @@ impl App {
         Self::default()
     }
 
-    /// Registers a generic Plugin builder strategy and applies its logic.
     pub fn add_plugin<P: Plugin>(&mut self, plugin: P) -> &mut Self {
         plugin.build(self);
         self
     }
 
-    /// Extends the global `World` memory with a new Singleton Resource.
     pub fn insert_resource<R: Resource>(&mut self, resource: R) -> &mut Self {
         self.world.insert_resource(resource);
         self
     }
 
-    /// Adds a structural ECS Event type by injecting the `Events<T>` queue tracking resource into the Core World.
     pub fn add_event<T: Send + Sync + 'static>(&mut self) -> &mut Self {
         self.insert_resource(Events::<T>::new());
         self
@@ -57,15 +57,38 @@ impl App {
         self
     }
 
-    /// Enters the application's core blocking loop, executing sequentially scheduled `Systems` iteratively 
-    /// until an `AppExit` system payload triggers a graceful application break step.
-    pub fn run(&mut self) {
-        loop {
-            self.schedule.run(&mut self.world);
-            
-            if let Some(exit_events) = self.world.resource::<Events<AppExit>>() {
-                if !exit_events.events.is_empty() {
-                    break; // Application has received an exit signal
+    /// Install a custom runner that replaces the default game loop.
+    /// The runner receives ownership of the `App` and is responsible for
+    /// calling `app.update()` each frame.
+    pub fn set_runner(&mut self, runner: impl FnOnce(App) + 'static) -> &mut Self {
+        self.runner = Some(Box::new(runner));
+        self
+    }
+
+    /// Run one tick of the ECS schedule and check for AppExit.
+    /// Returns `true` if the app should continue, `false` if exit was requested.
+    pub fn update(&mut self) -> bool {
+        self.schedule.run(&mut self.world);
+
+        if let Some(exit_events) = self.world.resource::<Events<AppExit>>() {
+            if !exit_events.events.is_empty() {
+                return false;
+            }
+        }
+        true
+    }
+
+    /// Enter the application's blocking loop.
+    /// If a custom runner was installed (e.g. by WindowPlugin), it takes over.
+    /// Otherwise, falls back to a simple loop.
+    pub fn run(mut self) {
+        if let Some(runner) = self.runner.take() {
+            runner(self);
+        } else {
+            // Default headless loop
+            loop {
+                if !self.update() {
+                    break;
                 }
             }
         }
@@ -79,7 +102,7 @@ mod tests {
 
     struct FrameCounter(u32);
 
-    fn exit_after_n_frames(mut counter: crate::system::ResMut<FrameCounter>, mut exit_events: EventWriter<AppExit>) {
+    fn exit_after_n_frames(counter: crate::system::ResMut<FrameCounter>, mut exit_events: EventWriter<AppExit>) {
         counter.0.0 += 1;
         if counter.0.0 >= 3 {
             exit_events.send(AppExit);
@@ -87,14 +110,25 @@ mod tests {
     }
 
     #[test]
-    fn app_runs_loop_and_exits() {
+    fn app_update_runs_and_exits() {
         let mut app = App::new();
         app.insert_resource(FrameCounter(0));
         app.add_system::<fn(crate::system::ResMut<'static, FrameCounter>, EventWriter<'static, AppExit>), _>(exit_after_n_frames);
-        
-        // This will block indefinitely if `AppExit` logic fails
-        app.run();
-        
+
+        // Use update() so we retain access to app for assertions
+        while app.update() {}
+
         assert_eq!(app.world.resource::<FrameCounter>().unwrap().0, 3);
     }
+
+    #[test]
+    fn app_run_consumes_and_exits() {
+        let mut app = App::new();
+        app.insert_resource(FrameCounter(0));
+        app.add_system::<fn(crate::system::ResMut<'static, FrameCounter>, EventWriter<'static, AppExit>), _>(exit_after_n_frames);
+
+        // run() consumes self — if it doesn't panic or hang, exit worked
+        app.run();
+    }
 }
+
