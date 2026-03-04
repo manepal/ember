@@ -6,6 +6,7 @@ description = "Render graph, wgpu backend, window management, and camera"
 
 [dependencies]
 ember_core = { path = "../ember_core" }
+ember_input = { path = "../ember_input" }
 wgpu = "24"
 winit = "0.30"
 glam = "0.29"

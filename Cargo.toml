@@ -4,5 +4,8 @@ members = [
     "crates/ember_render",
     "crates/ember_2d",
     "crates/ember_animation",
+    "crates/ember_input",
+    "crates/ember_assets",
+    "crates/ember_scene",
 ]
 resolver = "2"

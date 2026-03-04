@@ -158,6 +158,73 @@ impl ApplicationHandler for EmberAppHandler {
                     ember_win.window.request_redraw();
                 }
             }
+            WindowEvent::KeyboardInput {
+                event: kb_event, ..
+            } => {
+                // Send KeyboardInputEvent to the ECS
+                if let winit::keyboard::PhysicalKey::Code(key_code) = kb_event.physical_key {
+                    if let Some(events) = self
+                        .app
+                        .world
+                        .resource_mut::<ember_core::event::Events<ember_input::KeyboardInputEvent>>(
+                        )
+                    {
+                        // events is mutable anyway because resource_mut returns a mutable reference wrapper
+                        let events = events;
+                        events.send(ember_input::KeyboardInputEvent {
+                            key_code,
+                            state: kb_event.state,
+                        });
+                    }
+                }
+            }
+            WindowEvent::MouseInput { state, button, .. } => {
+                if let Some(events) = self
+                    .app
+                    .world
+                    .resource_mut::<ember_core::event::Events<ember_input::MouseButtonEvent>>()
+                {
+                    let events = events;
+                    events.send(ember_input::MouseButtonEvent { button, state });
+                }
+            }
+            WindowEvent::CursorMoved { position, .. } => {
+                let pos = glam::Vec2::new(position.x as f32, position.y as f32);
+                let delta =
+                    if let Some(mouse) = self.app.world.resource::<ember_input::MouseState>() {
+                        pos - mouse.position
+                    } else {
+                        glam::Vec2::ZERO
+                    };
+
+                if let Some(events) = self
+                    .app
+                    .world
+                    .resource_mut::<ember_core::event::Events<ember_input::MouseMoveEvent>>()
+                {
+                    let events = events;
+                    events.send(ember_input::MouseMoveEvent {
+                        position: pos,
+                        delta,
+                    });
+                }
+            }
+            WindowEvent::MouseWheel { delta, .. } => {
+                let d = match delta {
+                    winit::event::MouseScrollDelta::LineDelta(x, y) => glam::Vec2::new(x, y),
+                    winit::event::MouseScrollDelta::PixelDelta(pos) => {
+                        glam::Vec2::new(pos.x as f32, pos.y as f32)
+                    }
+                };
+                if let Some(events) = self
+                    .app
+                    .world
+                    .resource_mut::<ember_core::event::Events<ember_input::MouseScrollEvent>>()
+                {
+                    let events = events;
+                    events.send(ember_input::MouseScrollEvent { delta: d });
+                }
+            }
             _ => {}
         }
     }

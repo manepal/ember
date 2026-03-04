@@ -1,15 +1,14 @@
 [package]
-name = "ember_animation"
+name = "ember_input"
 version = "0.1.0"
 edition = "2021"
-description = "Sprite sheet animation, tweening, and animation state machines"
+description = "Keyboard, Mouse, Gamepad state"
 
 [dependencies]
 ember_core = { path = "../ember_core" }
+winit = "0.30"
 glam = "0.29"
 
 [dev-dependencies]
 ember_2d = { path = "../ember_2d" }
 ember_render = { path = "../ember_render" }
-wgpu = "24"
-bytemuck = { version = "1", features = ["derive"] }

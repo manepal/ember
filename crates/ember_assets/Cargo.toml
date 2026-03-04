@@ -1,0 +1,11 @@
+[package]
+name = "ember_assets"
+version = "0.1.0"
+edition = "2021"
+description = "AssetServer, Handle<T>, loaders, hot-reload"
+
+[dependencies]
+ember_core = { path = "../ember_core" }
+crossbeam-channel = "0.5"
+
+[dev-dependencies]
