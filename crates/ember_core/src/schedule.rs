@@ -12,7 +12,7 @@ impl Schedule {
         Self::default()
     }
 
-    pub fn add_system<M: 'static, S: IntoSystem<M>>(&mut self, system: S) 
+    pub fn add_system<M: 'static, S: IntoSystem<M>>(&mut self, system: S)
     where
         S::System: 'static,
     {
@@ -49,20 +49,31 @@ mod tests {
     #[test]
     fn schedule_runs_system_closure() {
         let mut world = World::new();
-        world.spawn().insert(Position(0.0, 0.0)).insert(Velocity(1.0, 2.0)).id();
-        world.spawn().insert(Position(5.0, -5.0)).insert(Velocity(-1.0, 1.0)).id();
-        
+        world
+            .spawn()
+            .insert(Position(0.0, 0.0))
+            .insert(Velocity(1.0, 2.0))
+            .id();
+        world
+            .spawn()
+            .insert(Position(5.0, -5.0))
+            .insert(Velocity(-1.0, 1.0))
+            .id();
+
         world.insert_resource(TimeDelta(0.5));
 
         let mut schedule = Schedule::new();
-        
-        fn physics_system(mut query: Query<(&'static mut Position, &'static Velocity)>, time: Res<TimeDelta>) {
+
+        fn physics_system(
+            query: Query<(&'static mut Position, &'static Velocity)>,
+            time: Res<TimeDelta>,
+        ) {
             for (pos, vel) in query.iter() {
-                pos.0 += vel.0 * time.0.0;
-                pos.1 += vel.1 * time.0.0;
+                pos.0 += vel.0 * time.0 .0;
+                pos.1 += vel.1 * time.0 .0;
             }
         }
-        
+
         schedule.add_system::<fn(Query<'static, (&'static mut Position, &'static Velocity)>, Res<'static, TimeDelta>), _>(physics_system);
 
         schedule.run(&mut world);

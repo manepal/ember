@@ -111,7 +111,10 @@ impl Plugin for ShapesDemoPlugin {
 fn main() {
     let mut app = App::new();
     app.add_plugin(ember_core::plugin::CorePlugin);
-    app.add_plugin(WindowPlugin::default());
+    app.add_plugin(WindowPlugin {
+        title: "Ember Engine — Shapes Demo".to_string(),
+        ..Default::default()
+    });
     app.add_plugin(RenderPlugin);
     app.add_plugin(ShapesDemoPlugin);
     app.run();

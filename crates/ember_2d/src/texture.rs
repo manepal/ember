@@ -1,3 +1,5 @@
+use ember_assets::image_loader::Image;
+
 /// A GPU texture with its view and sampler, ready for binding.
 pub struct Texture {
     pub texture: wgpu::Texture,
@@ -8,6 +10,16 @@ pub struct Texture {
 }
 
 impl Texture {
+    /// Create a texture from an Image asset.
+    pub fn from_image(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        image: &Image,
+        label: Option<&str>,
+    ) -> Self {
+        Self::from_rgba(device, queue, &image.data, image.width, image.height, label)
+    }
+
     /// Create a texture from raw RGBA8 pixel data.
     pub fn from_rgba(
         device: &wgpu::Device,

@@ -1,7 +1,9 @@
 use glam::{Vec2, Vec4};
+use serde::{Deserialize, Serialize};
 
-/// A 2D transform component for positioning, rotating, and scaling entities.
-#[derive(Debug, Clone)]
+/// A 2D transform representing position, rotation, and uniform scale.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Transform2D {
     pub position: Vec2,
     pub rotation: f32,
@@ -21,8 +23,19 @@ impl Default for Transform2D {
     }
 }
 
+/// A local 2D transform modifier, to be applied relative to a parent.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct LocalTransform2D(pub Transform2D);
+
+impl Default for LocalTransform2D {
+    fn default() -> Self {
+        Self(Transform2D::default())
+    }
+}
+
 /// A rectangular region within a texture (in pixel coordinates).
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Rect {
     pub x: f32,
     pub y: f32,
@@ -51,8 +64,9 @@ impl Rect {
     }
 }
 
-/// A 2D sprite component.
-#[derive(Debug, Clone)]
+/// Component representing a renderable 2D sprite.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Sprite {
     /// Index into the TextureStore.
     pub texture_index: usize,
