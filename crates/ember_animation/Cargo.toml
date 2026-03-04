@@ -1,0 +1,11 @@
+[package]
+name = "ember_animation"
+version = "0.1.0"
+edition = "2021"
+description = "Sprite sheet animation, tweening, and animation state machines"
+
+[dependencies]
+ember_core = { path = "../ember_core" }
+glam = "0.29"
+
+[dev-dependencies]

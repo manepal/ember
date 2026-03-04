@@ -38,6 +38,43 @@ impl Plugin for RenderPlugin {
     }
 }
 
+/// Callbacks that run once after wgpu initialization completes.
+/// Use this to create GPU resources that need the device (textures, pipelines).
+///
+/// # Usage
+/// ```ignore
+/// let mut callbacks = GpuStartupCallbacks::new();
+/// callbacks.add(|app| {
+///     let ctx = app.world.resource::<RenderContext>().unwrap();
+///     // create textures, pipelines, etc.
+/// });
+/// app.insert_resource(callbacks);
+/// ```
+/// A startup callback that runs after GPU initialization.
+pub type GpuStartupFn = Box<dyn FnOnce(&mut App) + Send + Sync>;
+
+pub struct GpuStartupCallbacks {
+    pub callbacks: Vec<GpuStartupFn>,
+}
+
+impl Default for GpuStartupCallbacks {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl GpuStartupCallbacks {
+    pub fn new() -> Self {
+        Self {
+            callbacks: Vec::new(),
+        }
+    }
+
+    pub fn add<F: FnOnce(&mut App) + Send + Sync + 'static>(&mut self, f: F) {
+        self.callbacks.push(Box::new(f));
+    }
+}
+
 /// Called by the window handler after the window is created.
 /// Initializes wgpu Instance, Adapter, Device, Queue, and Surface.
 pub fn initialize_wgpu(app: &mut App, window: Arc<WinitWindow>) {

@@ -2,5 +2,7 @@
 members = [
     "crates/ember_core",
     "crates/ember_render",
+    "crates/ember_2d",
+    "crates/ember_animation",
 ]
 resolver = "2"
