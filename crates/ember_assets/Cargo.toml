@@ -7,5 +7,9 @@ description = "AssetServer, Handle<T>, loaders, hot-reload"
 [dependencies]
 ember_core = { path = "../ember_core" }
 crossbeam-channel = "0.5"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
 
 [dev-dependencies]
+ember_2d = { path = "../ember_2d" }
+ember_render = { path = "../ember_render" }
+glam = "0.29"

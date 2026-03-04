@@ -135,7 +135,7 @@ impl AssetServer {
 /// Generic system that processes results from the background threads for type `T`.
 pub fn update_asset_state<T: Send + Sync + 'static>(
     mut assets: ResMut<Assets<T>>,
-    mut server: ResMut<AssetServer>,
+    server: ResMut<AssetServer>,
     channel: ResMut<AssetChannel<T>>,
     mut events: ResMut<Events<AssetEvent<T>>>,
 ) {
