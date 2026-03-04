@@ -11,59 +11,59 @@
 
 ### 2.1 Window Management
 
-- [ ] Create `WindowPlugin` wrapping `winit`
-- [ ] Implement `Window` resource (handle, size, title, vsync, fullscreen flag)
-- [ ] Bridge `winit` event loop with the engine's `App::run()` loop
-- [ ] Handle resize events — update surface configuration
-- [ ] Handle close event — clean shutdown
+- [x] Create `WindowPlugin` wrapping `winit`
+- [x] Implement `Window` resource (handle, size, title, vsync, fullscreen flag)
+- [x] Bridge `winit` event loop with the engine's `App::run()` loop
+- [x] Handle resize events — update surface configuration
+- [x] Handle close event — clean shutdown
 
 ### 2.2 wgpu Initialization
 
-- [ ] Create `RenderPlugin` that initializes wgpu on startup
-- [ ] Implement `RenderContext` resource:
+- [x] Create `RenderPlugin` that initializes wgpu on startup
+- [x] Implement `RenderContext` resource:
   - `Instance`, `Adapter`, `Device`, `Queue`
   - `Surface`, `SurfaceConfiguration`
-- [ ] Handle device loss and recovery
-- [ ] Implement `RenderSettings` resource (present mode, power preference, sample count)
+- [x] Handle device loss and recovery
+- [x] Implement `RenderSettings` resource (present mode, power preference, sample count)
 
 ### 2.3 Render Graph Framework
 
-- [ ] Define `RenderGraph` struct — DAG of `RenderNode`s
-- [ ] Define `RenderNode` trait:
+- [x] Define `RenderGraph` struct — DAG of `RenderNode`s
+- [x] Define `RenderNode` trait:
   - `fn input_slots() -> Vec<SlotDescriptor>`
   - `fn output_slots() -> Vec<SlotDescriptor>`
   - `fn run(&self, context: &mut RenderContext, world: &World)`
-- [ ] Implement slot types: `TextureSlot`, `BufferSlot`
-- [ ] Implement graph builder: `graph.add_node("name", node)`, `graph.add_edge("from", "to")`
-- [ ] Implement graph resolution — topological sort, validate no cycles, resolve slot connections
-- [ ] Implement graph executor — runs nodes in order, passes resources between them
+- [x] Implement slot types: `TextureSlot`, `BufferSlot`
+- [x] Implement graph builder: `graph.add_node("name", node)`, `graph.add_edge("from", "to")`
+- [x] Implement graph resolution — topological sort, validate no cycles, resolve slot connections
+- [x] Implement graph executor — runs nodes in order, passes resources between them
 
 ### 2.4 Clear Pass Node
 
-- [ ] Implement `ClearPassNode` — clears the swap chain texture to a configurable color
-- [ ] Register as the first node in the default render graph
-- [ ] Add `ClearColor` resource to control the background color
+- [x] Implement `ClearPassNode` — clears the swap chain texture to a configurable color
+- [x] Register as the first node in the default render graph
+- [x] Add `ClearColor` resource to control the background color
 
 ### 2.5 Frame Presentation
 
-- [ ] Implement frame lifecycle: acquire surface texture → run render graph → present
-- [ ] Implement `RenderSystem` that executes the render graph each frame
-- [ ] Wire into the app's game loop (runs after all update systems)
+- [x] Implement frame lifecycle: acquire surface texture → run render graph → present
+- [x] Implement `RenderSystem` that executes the render graph each frame
+- [x] Wire into the app's game loop (runs after all update systems)
 
 ### 2.6 Camera Foundation
 
-- [ ] Implement `Camera2D` component: position, zoom, viewport rect
-- [ ] Implement orthographic projection matrix computation
-- [ ] Create camera uniform buffer (view-projection matrix)
-- [ ] Upload camera uniforms to GPU each frame
+- [x] Implement `Camera2D` component: position, zoom, viewport rect
+- [x] Implement orthographic projection matrix computation
+- [x] Create camera uniform buffer (view-projection matrix)
+- [x] Upload camera uniforms to GPU each frame
 
 ---
 
 ## Exit Criteria
 
-- [ ] `cargo test -p ember_render` — all tests pass
-- [ ] `cargo clippy -p ember_render -- -D warnings` — clean
-- [ ] `examples/hello_window` — window opens, shows solid color, resizes correctly, closes cleanly
+- [x] `cargo test -p ember_render` — all tests pass
+- [x] `cargo clippy -p ember_render -- -D warnings` — clean
+- [x] `examples/hello_window` — window opens, shows solid color, resizes correctly, closes cleanly
 
 ## Example
 
